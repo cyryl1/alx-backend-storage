@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+"""
+Module that inserts a new document in a collection basedx kwargs.
+"""
 def insert_school(mongo_collection, **kwargs):
     """
     Inserts a new school document into the MongoDB collection.
