@@ -4,7 +4,26 @@ Module for implementing a Redis cache class
 """
 import redis
 import uuid
-from typing import Union
+from typing import Union, Callable, Optional
+from functools import wraps
+
+def count_calls(method: Callable) -> Callable:
+    """
+    Decorator to count how many times methods of Cache class are called
+    Args:
+        method: The method to be decorated
+    Returns:
+        Callable: The wrrapped method
+    """
+    @wraps(method)
+    def wrapper(self, *args, **kwargs):
+        """
+        Wrapper function that increments the call count and calls the method
+        """
+        key = method.__qualname__
+        self._redis.incr(key)
+        return method(self, *args, **kwargs)
+    return wrapper
 
 class Cache:
     """
@@ -18,6 +37,7 @@ class Cache:
         self._redis = redis.Redis()
         self._redis.flushdb()
 
+    @count_calls
     def store(self, data: Union[str, bytes, int, float]) -> str:
         """
         Store the input data in redis using a random key and return the key
